@@ -16,7 +16,7 @@ Transform your terminal experience with dynamic parameter extraction from help p
 
 ## 🎯 Perfect For
 
-- **Security Professionals**: Works seamlessly with tools like `nmap`, `binwalk`, `exiftool`, `metasploit`
+- **Security Professionals**: Works seamlessly with tools like `masscan`, `radare2`, `volatility`, `binwalk`
 - **Developers**: Supports any CLI tool including `docker`, `kubectl`, `git`, `npm`
 - **System Administrators**: Enhanced experience with `systemctl`, `iptables`, `tcpdump`
 - **Anyone**: Improves productivity with ANY command-line application
