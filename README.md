@@ -154,13 +154,8 @@ We welcome contributions! Here's how you can help:
 4. **📝 Documentation**: Help improve our docs
 5. **🧪 Testing**: Test with new tools and report compatibility
 
-### Development Setup
-```bash
-git clone https://github.com/yourusername/universal-terminal-completion.git
-cd universal-terminal-completion
-# Make your changes to terminal.zsh
-source terminal.zsh  # Test your changes
-```
+
+
 
 ## 📄 License
 
