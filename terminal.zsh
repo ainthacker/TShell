@@ -97,11 +97,65 @@ else
 └──╼ %F{red}#%f '
 fi
 
+# File completion widget for Shift+TAB  
+_shift_tab_completion() {
+    # Mevcut buffer'dan son kelimeyi al
+    local words=(${(z)BUFFER})
+    local current_word="${words[-1]}"
+    
+    # Eğer boşlukla bitiyorsa, yeni kelime başlıyoruz
+    if [[ $BUFFER[-1] == ' ' ]]; then
+        current_word=""
+    fi
+    
+    # File pattern oluştur
+    local pattern="${current_word}*"
+    local matches=(${~pattern})
+    
+    if [[ ${#matches[@]} -eq 1 && -e "${matches[1]}" ]]; then
+        # Tek match var, tamamla
+        if [[ $BUFFER[-1] == ' ' ]]; then
+            BUFFER="${BUFFER}${matches[1]}"
+        else
+            # Son kelimeyi değiştir
+            BUFFER="${BUFFER%${current_word}}${matches[1]}"
+        fi
+        CURSOR=${#BUFFER}
+        
+        # Eğer dizinse, / ekle
+        if [[ -d "${matches[1]}" ]]; then
+            BUFFER="${BUFFER}/"
+            CURSOR=${#BUFFER}
+        fi
+    elif [[ ${#matches[@]} -gt 1 ]]; then
+        # Birden fazla match, listele
+        zle -M "Multiple matches: ${matches[*]}"
+    else
+        zle -M "No matches found for: ${pattern}"
+    fi
+}
 
+# Widget olarak kaydet
+zle -N _shift_tab_completion
+
+# Shift+TAB key binding - Birden fazla denemeli
+bindkey '^[[Z' _shift_tab_completion    # Shift+TAB (çoğu terminal)
+bindkey '\e[Z' _shift_tab_completion    # Shift+TAB (alternatif)  
+bindkey '^[^I' _shift_tab_completion    # ESC+TAB
+bindkey '\e^I' _shift_tab_completion    # ESC+TAB (alternatif)
+bindkey '^I^[[Z' _shift_tab_completion  # TAB+Shift kombination
 
 # Test fonksiyonu
 test_help() {
     local cmd=$1
     echo "=== $cmd parametreleri ==="
     _get_command_help "$cmd"
+}
+
+# Key sequence test fonksiyonu
+test_key_sequence() {
+    echo "Press Shift+TAB and then Enter to see the key sequence:"
+    read -k key_sequence
+    echo "Key sequence: $key_sequence"
+    echo "Hex: $(echo -n "$key_sequence" | xxd)"
 }
