@@ -38,6 +38,12 @@ _universal_completion() {
     local cmd="${words[1]}"
     if ! command -v "$cmd" &>/dev/null; then return 1; fi
     
+    # Komut değiştiğinde help cache'i temizle
+    if [[ "$cmd" != "${_last_cmd:-}" ]]; then
+        _help_shown=()
+        _last_cmd="$cmd"
+    fi
+    
     case "${words[CURRENT-1]}" in
         -f|--file|-o|--output|-c|--config) _files; return 0;;
         -d|--dir|--directory) _directories; return 0;;
@@ -48,9 +54,8 @@ _universal_completion() {
             if [[ -z "${_help_shown[$help_key]}" ]]; then
                 local help_info=$(_get_cached_help "$cmd")
                 if [[ -n "$help_info" ]]; then
-                    # Clear screen üst kısmını temizle ve help'i göster
-                    clear
-                    printf "\033[1;34m=== %s Help Information ===\033[0m\n" "$cmd"
+                    # Help bilgisini göster (geçmişi silmeden)
+                    printf "\n\033[1;34m=== %s Help Information ===\033[0m\n" "$cmd"
                     printf "%s\n" "$help_info"  
                     printf "\033[1;34m========================\033[0m\n"
                     printf "\033[1;32mComplete the command using the information above:\033[0m\n"
@@ -114,11 +119,19 @@ _shift_tab_completion() {
     
     if [[ ${#matches[@]} -eq 1 && -e "${matches[1]}" ]]; then
         # Tek match var, tamamla
+        local match="${matches[1]}"
+        
+        # Boşluk varsa quote et (en yaygın durum)
+        if [[ $match == *\ * ]]; then
+            # Double quote kullan - daha güvenli
+            match="\"${match//\"/\\\"}\""
+        fi
+        
         if [[ $BUFFER[-1] == ' ' ]]; then
-            BUFFER="${BUFFER}${matches[1]}"
+            BUFFER="${BUFFER}${match}"
         else
             # Son kelimeyi değiştir
-            BUFFER="${BUFFER%${current_word}}${matches[1]}"
+            BUFFER="${BUFFER%${current_word}}${match}"
         fi
         CURSOR=${#BUFFER}
         
@@ -151,6 +164,15 @@ test_help() {
     echo "=== $cmd parametreleri ==="
     _get_command_help "$cmd"
 }
+
+# Help cache'i temizle (komut çalıştırıldığında)
+reset_help_shown() {
+    _help_shown=()
+}
+
+# ZSH hook - komut çalıştırılmadan önce help cache'i temizle
+autoload -U add-zsh-hook
+add-zsh-hook preexec reset_help_shown
 
 # Key sequence test fonksiyonu
 test_key_sequence() {
