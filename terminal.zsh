@@ -18,30 +18,17 @@ _get_command_help() {
     
     # Parametreleri ve açıklamalarını çıkar
     echo "$help_text" | awk '
-    /^[[:space:]]*-[a-zA-Z0-9]/ || /^[[:space:]]*--[a-zA-Z0-9-]+/ {
-        # Satırı temizle
+    /^[[:space:]]*-[[:alnum:]]/ || /^[[:space:]]*--[[:alnum:]-]+/ {
         gsub(/^[[:space:]]+/, "")
-        
-        # Parametre ve açıklamayı ayır
-        if (match($0, /^(-[a-zA-Z0-9]|--[a-zA-Z0-9-]+)/)) {
+        if (match($0, /^(-{1,2}[[:alnum:]-]+)/)) {
             param = substr($0, RSTART, RLENGTH)
-            desc = substr($0, RLENGTH + 1)
-            
-            # Açıklamayı temizle
+            desc  = substr($0, RLENGTH + 1)
             gsub(/^[[:space:],:]+/, "", desc)
             gsub(/[[:space:]]+$/, "", desc)
-            
-            # Çok uzun açıklamaları kısalt
             if (length(desc) > 60) {
                 desc = substr(desc, 1, 60) "..."
             }
-            
-            # Sonucu yazdır
-            if (desc != "") {
-                print param ":" desc
-            } else {
-                print param
-            }
+            if (desc != "") print param ":" desc; else print param
         }
     }'
 }
@@ -51,12 +38,10 @@ declare -A _help_cache
 
 _get_cached_help() {
     local cmd=$1
-    local cache_key=$(basename $cmd)
-    
+    local cache_key=$(basename "$cmd")
     if [ -z "${_help_cache[$cache_key]}" ]; then
-        _help_cache[$cache_key]=$(_get_command_help $cmd)
+        _help_cache[$cache_key]=$(_get_command_help "$cmd")
     fi
-    
     echo "${_help_cache[$cache_key]}"
 }
 
@@ -64,43 +49,16 @@ _get_cached_help() {
 _universal_completion() {
     local cmd="${words[1]}"
     local -a completions
-    
-    # Komut var mı kontrol et
-    if ! command -v $cmd &>/dev/null; then
-        return 1
-    fi
-    
-    # Help bilgilerini al
-    local help_info=$(_get_cached_help $cmd)
-    
-    # ZSH formatına çevir
+    if ! command -v "$cmd" &>/dev/null; then return 1; fi
+    local help_info=$(_get_cached_help "$cmd")
     while IFS= read -r line; do
-        if [[ -n "$line" ]]; then
-            completions+=("$line")
-        fi
+        [[ -n "$line" ]] && completions+=("$line")
     done <<< "$help_info"
-    
-    # Özel durumlar
     case "${words[CURRENT-1]}" in
-        -f|--file|-o|--output|-c|--config)
-            _files
-            return 0
-            ;;
-        -d|--dir|--directory)
-            _directories
-            return 0
-            ;;
-        -p|--port)
-            _values 'ports' '80:HTTP' '443:HTTPS' '22:SSH' '21:FTP'
-            return 0
-            ;;
-        *)
-            # Parametreleri göster
-            if [ ${#completions[@]} -gt 0 ]; then
-                _describe 'options' completions
-            fi
-            return 0
-            ;;
+        -f|--file|-o|--output|-c|--config) _files; return 0;;
+        -d|--dir|--directory) _directories; return 0;;
+        -p|--port) _values 'ports' '80:HTTP' '443:HTTPS' '22:SSH' '21:FTP'; return 0;;
+        *) [[ ${#completions[@]} -gt 0 ]] && _describe 'options' completions; return 0;;
     esac
 }
 
@@ -112,13 +70,13 @@ compinit
 compdef _universal_completion -default-
 
 # Prompt ayarları - Parrot OS stili
+autoload -U colors && colors
 if [[ $EUID -ne 0 ]]; then
-    # Normal kullanıcı prompt'u - Parrot OS stili
-    PROMPT='┌─[%F{green}%n@%m%f]─[%F{blue}%~%f]
+    # Normal kullanıcı prompt'u - iki satırlı gerçek newline
+    PROMPT=$'┌─[%F{green}%n@%m%f]─[%F{blue}%~%f]
 └──╼ %F{cyan}$%f '
 else
-    # Root prompt'u - Parrot OS stili
-    PROMPT='┌─[%F{red}%n@%m%f]─[%F{blue}%~%f]
+    PROMPT=$'┌─[%F{red}%n@%m%f]─[%F{blue}%~%f]
 └──╼ %F{red}#%f '
 fi
 
@@ -126,6 +84,5 @@ fi
 test_help() {
     local cmd=$1
     echo "=== $cmd parametreleri ==="
-    _get_command_help $cmd
+    _get_command_help "$cmd"
 }
-
