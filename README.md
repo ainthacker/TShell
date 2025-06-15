@@ -167,12 +167,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - **Parrot OS Team**: For the beautiful terminal aesthetic inspiration
 - **Security Community**: For testing and feedback with security tools
 
-## 📞 Support
-
-- 🐛 **Issues**: [GitHub Issues](https://github.com/yourusername/universal-terminal-completion/issues)
-- 💬 **Discussions**: [GitHub Discussions](https://github.com/yourusername/universal-terminal-completion/discussions)
-- 📧 **Email**: your.email@example.com
-
 ---
 
 ⭐ **If this project helped you, please give it a star!** ⭐
