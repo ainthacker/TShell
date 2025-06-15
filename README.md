@@ -4,12 +4,12 @@
 
 Transform your terminal experience with dynamic parameter extraction from help pages and man documentation. No more memorizing complex command syntax!
 
-## ✨ Features
+## Features
 
-- **🔄 Universal Compatibility**: Works with ANY command (system tools, GitHub tools, custom scripts)
-- **📚 Dynamic Parameter Extraction**: Automatically parses `--help`, `-h`, and man pages
-- **💡 Intelligent Descriptions**: Shows parameter descriptions alongside options
-- **⚡ Performance Optimized**: Built-in caching system for fast completions
+- **Universal Compatibility**: Works with ANY command (system tools, GitHub tools, custom scripts)
+- **Dynamic Parameter Extraction**: Automatically parses `--help`, `-h`, and man pages
+- **Intelligent Descriptions**: Shows parameter descriptions alongside options
+- **Performance Optimized**: Built-in caching system for fast completions
 - **🎨 Beautiful Parrot OS Style Prompt**: Clean, informative terminal prompt
 - **🔐 Security-Focused**: Perfect for penetration testers and security analysts
 - **📁 Context-Aware**: Smart completions for files, directories, ports, and more
@@ -21,7 +21,7 @@ Transform your terminal experience with dynamic parameter extraction from help p
 - **System Administrators**: Enhanced experience with `systemctl`, `iptables`, `tcpdump`
 - **Anyone**: Improves productivity with ANY command-line application
 
-## 🚀 Quick Start
+##  Quick Start
 
 ### Installation
 
@@ -41,9 +41,9 @@ Transform your terminal experience with dynamic parameter extraction from help p
    source ~/.zshrc
    ```
 
-That's it! 🎉
+That's it! 
 
-## 📖 Usage Examples
+##  Usage Examples
 
 ### Security Tools
 ```bash
@@ -82,7 +82,7 @@ tcpdump -[TAB]
 # Shows: -i:interface, -w:write to file, -r:read from file, etc.
 ```
 
-## 🎨 Beautiful Terminal Prompt
+##  Beautiful Terminal Prompt
 
 The plugin includes a stunning Parrot OS-style prompt:
 
@@ -148,11 +148,11 @@ The plugin automatically recognizes these parameter patterns:
 
 We welcome contributions! Here's how you can help:
 
-1. **🐛 Report Bugs**: Found an issue? Open an issue with details
-2. **💡 Suggest Features**: Have ideas? We'd love to hear them
-3. **🔧 Submit PRs**: Improvements and fixes are always welcome
-4. **📝 Documentation**: Help improve our docs
-5. **🧪 Testing**: Test with new tools and report compatibility
+1. **Report Bugs**: Found an issue? Open an issue with details
+2. **Suggest Features**: Have ideas? We'd love to hear them
+3. **Submit PRs**: Improvements and fixes are always welcome
+4. **Documentation**: Help improve our docs
+5. **Testing**: Test with new tools and report compatibility
 
 
 
