@@ -45,6 +45,10 @@ That's it!
 
 ##  Usage Examples
 
+1. **TAB** - Shows command help information
+2. **Shift+TAB** - Provides file/directory completion
+
+
 ### Security Tools
 ```bash
 # Nmap with intelligent completions
