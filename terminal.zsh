@@ -1,4 +1,4 @@
-# Universal Auto-Completion Plugin
+ Universal Auto-Completion Plugin
 # Herhangi bir komut için --help ve man sayfalarından otomatik tamamlama
 
 # Komutun parametrelerini ve açıklamalarını al
