@@ -1,7 +1,7 @@
- Universal Auto-Completion Plugin
+# Universal Auto-Completion Plugin
 # Herhangi bir komut için --help ve man sayfalarından otomatik tamamlama
 
-# Komutun parametrelerini ve açıklamalarını al
+# Komutun tam yardım bilgilerini al (parsing yapmadan)
 _get_command_help() {
     local cmd=$1
     local help_text=""
@@ -16,25 +16,13 @@ _get_command_help() {
         help_text=$($cmd 2>&1 | head -30)
     fi
     
-    # Parametreleri ve açıklamalarını çıkar
-    echo "$help_text" | awk '
-    /^[[:space:]]*-[[:alnum:]]/ || /^[[:space:]]*--[[:alnum:]-]+/ {
-        gsub(/^[[:space:]]+/, "")
-        if (match($0, /^(-{1,2}[[:alnum:]-]+)/)) {
-            param = substr($0, RSTART, RLENGTH)
-            desc  = substr($0, RLENGTH + 1)
-            gsub(/^[[:space:],:]+/, "", desc)
-            gsub(/[[:space:]]+$/, "", desc)
-            if (length(desc) > 60) {
-                desc = substr(desc, 1, 60) "..."
-            }
-            if (desc != "") print param ":" desc; else print param
-        }
-    }'
+    # Tüm yardım metnini olduğu gibi döndür
+    echo "$help_text"
 }
 
 # Önbellek sistemi
 declare -A _help_cache
+declare -A _help_shown
 
 _get_cached_help() {
     local cmd=$1
@@ -48,17 +36,38 @@ _get_cached_help() {
 # Ana tamamlama fonksiyonu
 _universal_completion() {
     local cmd="${words[1]}"
-    local -a completions
     if ! command -v "$cmd" &>/dev/null; then return 1; fi
-    local help_info=$(_get_cached_help "$cmd")
-    while IFS= read -r line; do
-        [[ -n "$line" ]] && completions+=("$line")
-    done <<< "$help_info"
+    
     case "${words[CURRENT-1]}" in
         -f|--file|-o|--output|-c|--config) _files; return 0;;
         -d|--dir|--directory) _directories; return 0;;
         -p|--port) _values 'ports' '80:HTTP' '443:HTTPS' '22:SSH' '21:FTP'; return 0;;
-        *) [[ ${#completions[@]} -gt 0 ]] && _describe 'options' completions; return 0;;
+        *) 
+            # Help bilgisini sadece bir kez göster
+            local help_key="${cmd}_${BUFFER}"
+            if [[ -z "${_help_shown[$help_key]}" ]]; then
+                local help_info=$(_get_cached_help "$cmd")
+                if [[ -n "$help_info" ]]; then
+                    # Clear screen üst kısmını temizle ve help'i göster
+                    clear
+                    printf "\033[1;34m=== %s Help Information ===\033[0m\n" "$cmd"
+                    printf "%s\n" "$help_info"  
+                    printf "\033[1;34m========================\033[0m\n"
+                    printf "\033[1;32mComplete the command using the information above:\033[0m\n"
+                    # Orijinal prompt'u tekrar göster
+                    printf "┌─[%s@%s]─[%s]\n" "$USER" "$(hostname)" "$(pwd | sed "s|$HOME|~|")"
+                    printf "└──╼ \033[0;36m$\033[0m %s" "$BUFFER"
+                    
+                    # Bu komut için help gösterildi olarak işaretle
+                    _help_shown[$help_key]=1
+                    
+                    # Completion'ı başarısız olarak işaretle
+                    return 1
+                fi
+            fi
+            
+            # Normal completion için boş dön
+            return 1;;
     esac
 }
 
