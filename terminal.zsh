@@ -75,8 +75,16 @@ _universal_completion() {
 autoload -Uz compinit
 compinit
 
-# Varsayılan tamamlama olarak ayarla
+# Universal completion'ı tüm komutlar için otomatik olarak uygula
 compdef _universal_completion -default-
+
+# Tüm executable dosyalar için otomatik olarak uygula  
+_compdef_all() {
+    for cmd in $(compgen -c); do
+        compdef _universal_completion "$cmd" 2>/dev/null
+    done
+}
+_compdef_all
 
 # Prompt ayarları - Parrot OS stili
 autoload -U colors && colors
@@ -88,6 +96,8 @@ else
     PROMPT=$'┌─[%F{red}%n@%m%f]─[%F{blue}%~%f]
 └──╼ %F{red}#%f '
 fi
+
+
 
 # Test fonksiyonu
 test_help() {
